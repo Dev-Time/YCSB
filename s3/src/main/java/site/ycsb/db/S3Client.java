@@ -151,6 +151,7 @@ public class S3Client extends DB {
         String maxErrorRetry = null;
         String maxConnections = null;
         String protocol = null;
+        Boolean legacy = false;
         BasicAWSCredentials s3Credentials;
         ClientConfiguration clientConfig;
         if (s3Client != null) {
@@ -198,6 +199,10 @@ public class S3Client extends DB {
           if (sse == null){
             sse = propsCL.getProperty("s3.sse", "false");
           }
+          String legacys = props.getProperty("s3.legacy-path");
+          if (legacys.equals("true")) {
+            legacy = true;
+          }
           String ssec = props.getProperty("s3.ssec");
           if (ssec == null){
             ssec = propsCL.getProperty("s3.ssec", null);
@@ -225,8 +230,10 @@ public class S3Client extends DB {
           s3Client.setRegion(Region.getRegion(Regions.fromName(region)));
           s3Client.setEndpoint(endPoint);
 
-          S3ClientOptions options = S3ClientOptions.builder().setPathStyleAccess(true).build();
-          s3Client.setS3ClientOptions(options);
+          if (legacy) {
+            S3ClientOptions options = S3ClientOptions.builder().setPathStyleAccess(true).build();
+            s3Client.setS3ClientOptions(options);
+          }
 
           System.out.println("Connection successfully initialized");
         } catch (Exception e){
