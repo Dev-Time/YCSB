@@ -26,7 +26,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.net.*;
 
 import com.amazonaws.util.IOUtils;
 import site.ycsb.ByteArrayByteIterator;
@@ -37,6 +36,7 @@ import site.ycsb.Status;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.*;
+import com.amazonaws.services.s3.S3ClientOptions;
 import com.amazonaws.auth.*;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
@@ -224,6 +224,10 @@ public class S3Client extends DB {
           s3Client = new AmazonS3Client(s3Credentials, clientConfig);
           s3Client.setRegion(Region.getRegion(Regions.fromName(region)));
           s3Client.setEndpoint(endPoint);
+
+          S3ClientOptions options = S3ClientOptions.builder().setPathStyleAccess(true).build();
+          s3Client.setS3ClientOptions(options);
+
           System.out.println("Connection successfully initialized");
         } catch (Exception e){
           System.err.println("Could not connect to S3 storage: "+ e.toString());
